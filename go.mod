@@ -1,6 +1,6 @@
 module github.com/pingcap/dead-mans-switch
 
-go 1.14
+go 1.16
 
 require (
 	github.com/PagerDuty/go-pagerduty v1.2.0

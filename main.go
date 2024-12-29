@@ -37,8 +37,15 @@ func main() {
 		log.Fatal(s.ListenAndServe())
 	}()
 
-	pagerDuty := NewPagerDutyNotify(config.Notify.Pagerduty.Key)
-	dms := NewDeadMansSwitch(evaluateMessage, config.Interval, pagerDuty.Notify)
+	var notify func(summary, detail string) error
+	if config.Notify.Pagerduty.Key != "" {
+		notify = NewPagerDutyNotify(config.Notify.Pagerduty.Key).Notify
+	} else if config.Notify.Webhook.Url != "" {
+		notify = NewWebhookNotify(config.Notify.Webhook.Url, config.Notify.Webhook.Method).Notify
+	} else {
+		log.Fatal("no notify config")
+	}
+	dms := NewDeadMansSwitch(evaluateMessage, config.Interval, notify)
 	go dms.Run()
 
 	stop := make(chan os.Signal, 1)
