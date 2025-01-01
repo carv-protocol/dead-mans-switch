@@ -38,9 +38,9 @@ func main() {
 	}()
 
 	var notify func(summary, detail string) error
-	if config.Notify.Pagerduty.Key != "" {
+	if config.Notify.Pagerduty != nil && config.Notify.Pagerduty.Key != "" {
 		notify = NewPagerDutyNotify(config.Notify.Pagerduty.Key).Notify
-	} else if config.Notify.Webhook.Url != "" {
+	} else if config.Notify.Webhook != nil && config.Notify.Webhook.Url != "" {
 		notify = NewWebhookNotify(config.Notify.Webhook.Url, config.Notify.Webhook.Method).Notify
 	} else {
 		log.Fatal("no notify config")
