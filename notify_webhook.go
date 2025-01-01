@@ -16,6 +16,7 @@ type WebhookNotify struct {
 }
 
 func NewWebhookNotify(url string, method string) *WebhookNotify {
+	log.Printf("webhook url: %s\nmethod: %s\n", url, method)
 	httpClient := &http.Client{}
 	return &WebhookNotify{
 		Url:        url,
@@ -61,7 +62,7 @@ func (w *WebhookNotify) Notify(summary, detail string) error {
 		outBuffer = bytes.NewBuffer(jsonData)
 	}
 
-	req, err := http.NewRequest(w.Method, w.Method, outBuffer)
+	req, err := http.NewRequest(w.Method, w.Url, outBuffer)
 	if err != nil {
 		return err
 	}
