@@ -3,10 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
 
 type WebhookNotify struct {
@@ -30,30 +30,11 @@ func (w *WebhookNotify) Notify(summary, detail string) error {
 
 	var outBuffer *bytes.Buffer
 	if w.Method == "POST" {
-		currentTime := time.Now()
 		payload := map[string]interface{}{
-			"receiver": "webhook",
-			"status":   "firing",
-			"alerts": map[string]interface{}{
-				"status": "firing",
-				"labels": map[string]interface{}{
-					"alertname": "WatchdogAlert",
-				},
-				"startsAt": currentTime.Format(time.RFC3339Nano),
-				"endsAt":   "0001-01-01T00:00:00Z",
-			},
-			"groupLabels": map[string]interface{}{
-				"alertname": "WatchdogAlert",
-			},
-			"commonLabels": map[string]interface{}{
-				"alertname": "WatchdogAlert",
-			},
-			"commonAnnotations": map[string]interface{}{
-				"summary":     summary,
-				"description": detail,
-			},
-			"version":  "4",
-			"groupKey": "{}:{alertname=\"WatchdogAlert\"}",
+			"state":    "firing",
+			"ruleName": "WatchdogAlert",
+			"message":  fmt.Sprintf("%s\n%s", summary, detail),
+			"ruleUrl":  "https://github.com/carv-protocol/kubernetes/blob/main/components/prometheus-alert/templates/watchdog.yaml",
 		}
 		jsonData, err := json.Marshal(payload)
 		if err != nil {
